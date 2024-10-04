@@ -1,8 +1,14 @@
-# React + Vite
+# Hacker Stories - React Tutorial
+| Info   | Value       |
+|--------|-------------|
+| Author | @maluberian |
+| Last Change | 10-04-2024  |
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
-
-Currently, two official plugins are available:
-
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+---
+# Description
+Just playing with React. Probably, time I got a  bit better with front-end.
+---
+# Change Log
+| Date | Implimentor | Notes |
+|------|-------------|-------|
+| 10-04-2024 | @maluberian | Project Initialization |
