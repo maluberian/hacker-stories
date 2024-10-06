@@ -1,35 +1,66 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
 import './App.css'
 
-function App() {
-  const [count, setCount] = useState(0)
+const list = [
+    {
+        greeting: 'Hello',
+        name: 'Dustin',
+        objectId: '27',
+        url: 'mailto:dclifford@gmail.com'
+    },
+    {
+        greeting: 'Ciao',
+        name: 'Bella',
+        objectId: '24',
+        url: 'mailto:bella@gmail.com',
+    },
+    {
+        greeting: 'Overtersain',
+        name: 'Patty',
+        objectId: '23',
+        url: 'mailto:hessx111@gmail.com',
+    },
+];
 
-  return (
-    <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count} you bad mofo!
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+function Item(prop) {
+    return (
+        <li key={prop.name}>{prop.greeting}
+            <a href={prop.url}>{prop.name}</a>
+        </li>
+    )
+}
+
+function List() {
+    return (
+        <ul>
+            {list.map(item => {
+                console.log(<Item key={item.name} name={item.name} greeting={item.greeting} url={item.url} />);
+                return (
+                    <Item key={item.name} name={item.name} greeting={item.greeting} url={item.url} />
+                );
+            })
+            }
+        </ul>
+    );
+}
+
+function Search() {
+    return (
+        <div>
+            <label htmlFor="search">Search: </label>
+            <input id="search" type="text"/>
+        </div>
+    );
+}
+
+function App() {
+
+    return (
+        <div>
+            <Search />
+            <hr />
+            <List/>
+        </div>
+    )
 }
 
 export default App
