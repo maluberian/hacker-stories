@@ -39,17 +39,13 @@ const List = (props) => {
     );
 }
 
-const Search = ({onSearch, search}) => {
-    console.log("Search render.")
-
-    const handleBlur = (event) => {
-        console.log(event.type, event.target.value, event)
-    }
+const Search = ({id, label, value, onInputChange}) => {
+    console.log(`Rendering search id=${id} for ${label}`)
 
     return (
         <>
-            <label htmlFor="search">Search: </label>
-            <input id="search" type="text" onChange={onSearch} onBlur={handleBlur} value={search}/>
+            <label htmlFor="search">{label}: </label>
+            <input id="search" type="text" onChange={onInputChange} value={value}/>
         </>
     );
 }
@@ -89,7 +85,7 @@ const App = () => {
     })
     return (
         <div>
-            <Search onSearch={handleSearch} search={searchTerm}/>
+            <Search id="search" onInputChange={handleSearch} label="Search" search={searchTerm}/>
             <hr/>
             <List list={searchedStories} />
             <Button/>
