@@ -47,10 +47,10 @@ const Search = ({onSearch, search}) => {
     }
 
     return (
-        <div>
+        <>
             <label htmlFor="search">Search: </label>
             <input id="search" type="text" onChange={onSearch} onBlur={handleBlur} value={search}/>
-        </div>
+        </>
     );
 }
 
