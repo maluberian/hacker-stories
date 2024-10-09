@@ -17,11 +17,9 @@ const Item = ({key, url, title, authors, num_comments, points}) => {
 }
 
 const List = (props) => {
-    console.log("List render.")
     return (
         <ul>
             {props.list.map(({object_id, ...item}) => {
-                console.log(<Item key={object_id} {...item} />);
                 return (
                     <Item key={object_id} {...item} />
                 )
@@ -30,20 +28,16 @@ const List = (props) => {
     );
 }
 
-const Search = ({id, label, value, onInputChange}) => {
-    console.log(`Rendering search id=${id} for ${label}`)
-
+const InputWithLabel = ({id, type = "text", label, value, onInputChange}) => {
     return (
         <>
             <label htmlFor="search">{label}: </label>
-            <input id="search" type="text" onChange={onInputChange} value={value}/>
+            <input id={id} type={type} onChange={onInputChange} value={value}/>
         </>
     );
 }
 
 const App = () => {
-    console.log("App render.")
-
     const list = [
         {
             title: 'React',
@@ -63,8 +57,11 @@ const App = () => {
         },
     ]
 
-    const [searchTerm, setSearchTerm] = useStorageState('search','React')
 
+    const [logMessage, setLogMessage] = useLogMessage()
+    const handleLogMessage = (event) => { setLogMessage(event.target.value) }
+
+    const [searchTerm, setSearchTerm] = useStorageState('search','React')
     const handleSearch = (event) => {
         console.log(event.target.value)
         setSearchTerm(event.target.value)
@@ -75,7 +72,8 @@ const App = () => {
     })
     return (
         <div>
-            <Search id="search" onInputChange={handleSearch} label="Search" search={searchTerm}/>
+            <InputWithLabel id="search" onInputChange={handleSearch} label="Search" search={searchTerm}/>
+            <InputWithLabel id="logMessage" type="url" onInputChange={handleLogMessage} label="Message" search={logMessage}/>
             <hr/>
             <List list={searchedStories} />
             <Divider/>
@@ -84,6 +82,12 @@ const App = () => {
             <DatePicker/>
         </div>
     );
+}
+
+const useLogMessage = () => {
+    const[msg, setMsg] = useState('--blank message--')
+    React.useEffect(() => { console.log(msg)}, [msg])
+    return [msg, setMsg]
 }
 
 const useStorageState = (key, initialState) => {
