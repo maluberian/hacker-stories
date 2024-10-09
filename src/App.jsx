@@ -1,18 +1,9 @@
 import * as React from 'react';
 
+import {Divider, DatePicker, Button} from "antd";
+
 import './App.css'
 import {useState} from "react";
-
-const initCount = () => {
-    return 0
-}
-
-const Button = () => {
-    console.log("Button render.")
-
-    let [clickCount, setClickCount] = useState(initCount);
-    return <button onClick={() => setClickCount(clickCount+1)}>Hello {clickCount}</button>
-}
 
 const Item = ({key, url, title, authors, num_comments, points}) => {
     return (
@@ -72,9 +63,8 @@ const App = () => {
         },
     ]
 
-    const [searchTerm, setSearchTerm] = useState(localStorage.getItem('react:searchTerm') ?? 'React')
+    const [searchTerm, setSearchTerm] = useStorageState('search','React')
 
-    React.useEffect(() => { localStorage.setItem('react:searchTerm', searchTerm) }, [ searchTerm])
     const handleSearch = (event) => {
         console.log(event.target.value)
         setSearchTerm(event.target.value)
@@ -88,12 +78,21 @@ const App = () => {
             <Search id="search" onInputChange={handleSearch} label="Search" search={searchTerm}/>
             <hr/>
             <List list={searchedStories} />
-            <Button/>
-            <Button/>
-            <Button/>
-            <Button/>
+            <Divider/>
+            <Button variant={"text"} iconPosition={"end"} loading={true}>Test</Button>
+            <Divider/>
+            <DatePicker/>
         </div>
     );
+}
+
+const useStorageState = (key, initialState) => {
+    const [value, setValue] = useState(localStorage.getItem(key) ?? initialState)
+    React.useEffect(() => {
+        localStorage.setItem(key, value)
+    }, [value, key])
+    return [value, setValue]
+
 }
 
 export default App
