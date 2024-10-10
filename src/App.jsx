@@ -28,10 +28,10 @@ const List = (props) => {
     );
 }
 
-const InputWithLabel = ({id, type = "text", label, value, onInputChange}) => {
+const InputWithLabel = ({id, type = "text", value, onInputChange, children}) => {
     return (
         <>
-            <label htmlFor="search">{label}: </label>
+            <label htmlFor="search">{children}</label>
             <input id={id} type={type} onChange={onInputChange} value={value}/>
         </>
     );
@@ -72,8 +72,8 @@ const App = () => {
     })
     return (
         <div>
-            <InputWithLabel id="search" onInputChange={handleSearch} label="Search" search={searchTerm}/>
-            <InputWithLabel id="logMessage" type="url" onInputChange={handleLogMessage} label="Message" search={logMessage}/>
+            <InputWithLabel id="search" onInputChange={handleSearch} search={searchTerm}><strong>Search:</strong></InputWithLabel>
+            <InputWithLabel id="logMessage" type="url" onInputChange={handleLogMessage} search={logMessage}><strong>Message:</strong></InputWithLabel>
             <hr/>
             <List list={searchedStories} />
             <Divider/>
