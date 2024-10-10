@@ -6,6 +6,7 @@ import './App.css'
 import {useState} from "react";
 
 const Item = ({key, url, title, authors, num_comments, points}) => {
+
     return (
         <li key={key}>
             <span><a href={url}>{title}</a></span>
@@ -28,11 +29,12 @@ const List = (props) => {
     );
 }
 
-const InputWithLabel = ({id, type = "text", value, onInputChange, children}) => {
+const InputWithLabel = ({id, type = "text", value, isFocused, onInputChange, children}) => {
+
     return (
         <>
             <label htmlFor="search">{children}</label>
-            <input id={id} type={type} onChange={onInputChange} value={value}/>
+            <input id={id} type={type} onChange={onInputChange} autoFocus={isFocused} value={value}/>
         </>
     );
 }
@@ -72,7 +74,7 @@ const App = () => {
     })
     return (
         <div>
-            <InputWithLabel id="search" onInputChange={handleSearch} search={searchTerm}><strong>Search:</strong></InputWithLabel>
+            <InputWithLabel id="search" isFocused onInputChange={handleSearch} search={searchTerm}><strong>Search:</strong></InputWithLabel>
             <InputWithLabel id="logMessage" type="url" onInputChange={handleLogMessage} search={logMessage}><strong>Message:</strong></InputWithLabel>
             <hr/>
             <List list={searchedStories} />
