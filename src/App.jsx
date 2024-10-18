@@ -6,6 +6,7 @@ import {useReducer, useState, useEffect} from "react";
 const API_ENDPOINT = 'https://hn.algolia.com/api/v1/search'
 
 const STORY_ACTIONS = {
+    FIRST_FETCH: 'FIRST_FETCH',
     STORIES_FETCH_INIT: 'STORIES_FETCH_INIT',
     STORIES_FETCH_SUCCESS: 'STORIES_FETCH_SUCCESS',
     STORES_FETCH_FAILURE: 'STORES_FETCH_FAILURE',
@@ -71,6 +72,13 @@ const useStorageState = (key, initialState) => {
 const App = () => {
     const storiesReducer = (state, action) => {
         switch (action.type) {
+            case STORY_ACTIONS.FIRST_FETCH:
+                return {
+                    ...state,
+                    isFirstLoad: true,
+                    isLoading: true,
+                    isError: false,
+                }
             case STORY_ACTIONS.STORIES_FETCH_INIT:
                 return {
                     ...state,
@@ -81,12 +89,14 @@ const App = () => {
                 return {
                     ...state,
                     data: action.payload,
+                    isFirstLoad: false,
                     isLoading: false,
                     isError: false,
                 }
             case STORY_ACTIONS.STORES_FETCH_FAILURE:
                 return {
                     ...state,
+                    isFirstLoad: true,
                     isLoading: false,
                     isError: true,
                 }
@@ -104,11 +114,24 @@ const App = () => {
         }
     }
 
+    const [searchTerm, setSearchTerm] = useStorageState('search', 'React')
+    const handleSearch = (event) => {
+        console.log(event.target.value)
+        setSearchTerm(event.target.value)
+    }
+
+    const [stories, dispatchStories] = useReducer(storiesReducer, {data: [], isLoading: false, isError: false})
+
     // load the stories
     useEffect(() => {
-        dispatchStories({type: STORY_ACTIONS.STORIES_FETCH_INIT})
 
-        fetch(`${API_ENDPOINT}?query=react`)
+        if(stories && !stories.isFirstLoad) {
+            dispatchStories({type: STORY_ACTIONS.STORIES_FETCH_INIT})
+        } else {
+            dispatchStories({type: STORY_ACTIONS.FIRST_FETCH})
+        }
+
+        fetch(`${API_ENDPOINT}?query=${searchTerm ? searchTerm : 'react'}`)
             .then(res => res.json())
             .then(json => {
                 console.log("result: ", json)
@@ -121,7 +144,7 @@ const App = () => {
                 console.error("error: ", err)
                 dispatchStories({type: STORY_ACTIONS.STORES_FETCH_FAILURE})
             })
-    }, [])
+    }, [searchTerm])
 
     const handleRemoveStory = (item) => {
         dispatchStories({type: STORY_ACTIONS.REMOVE_STORY, payload: item})
@@ -132,24 +155,11 @@ const App = () => {
         setLogMessage(event.target.value)
     }
 
-    const [searchTerm, setSearchTerm] = useStorageState('search', 'React')
-    const handleSearch = (event) => {
-        console.log(event.target.value)
-        setSearchTerm(event.target.value)
-    }
-
-    const [stories, dispatchStories] = useReducer(storiesReducer, {data: [], isLoading: false, isError: false})
-
-    const searchedStories = stories.data.filter((s) => {
-        console.log("filter: ", s)
-        return s.title.toLowerCase().includes(searchTerm.toLowerCase())
-    })
-
     console.log("state: ", stories)
     return (
         <div>
             {stories.isError && <p>Something went wrong!</p>}
-            {stories.isLoading ?
+            {stories && stories.isLoading && stories.isFirstLoad ?
                 (<p>Loading...</p>) :
                 (
                     <>
@@ -159,7 +169,7 @@ const App = () => {
                             <strong>Message:</strong>
                         </InputWithLabel>
                         <Divider/>
-                        <List stories={searchedStories} onRemoveStory={handleRemoveStory}/>
+                        <List stories={stories.data} onRemoveStory={handleRemoveStory}/>
                     </>
                 )
             }
