@@ -1,7 +1,7 @@
 import {Divider} from "antd";
 
 import './App.css'
-import {useReducer, useState, useEffect} from "react";
+import {useReducer, useState, useEffect, useCallback} from "react";
 
 const API_ENDPOINT = 'https://hn.algolia.com/api/v1/search'
 
@@ -123,7 +123,7 @@ const App = () => {
     const [stories, dispatchStories] = useReducer(storiesReducer, {data: [], isLoading: false, isError: false})
 
     // load the stories
-    useEffect(() => {
+    const handleFetchStories = useCallback(() => {
 
         if(stories && !stories.isFirstLoad) {
             dispatchStories({type: STORY_ACTIONS.STORIES_FETCH_INIT})
@@ -145,6 +145,9 @@ const App = () => {
                 dispatchStories({type: STORY_ACTIONS.STORES_FETCH_FAILURE})
             })
     }, [searchTerm])
+    useEffect(() => {
+        handleFetchStories()
+    }, [handleFetchStories])
 
     const handleRemoveStory = (item) => {
         dispatchStories({type: STORY_ACTIONS.REMOVE_STORY, payload: item})
