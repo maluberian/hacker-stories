@@ -30,7 +30,6 @@ const Item = ({key, item, onRemoveStory}) => {
 }
 
 const List = ({stories, onRemoveStory}) => {
-    console.log("list: ", stories)
     return (
         <ul key="stories">
             {stories.map((item) => {
@@ -42,12 +41,11 @@ const List = ({stories, onRemoveStory}) => {
     );
 }
 
-const InputWithLabel = ({id, type = "text", value, isFocused, onInputChange, children}) => {
-    console.log("input label: ", value)
+const InputWithLabel = ({id, type = "text", value, isFocused, onKeyDown, onInputChange, children}) => {
     return (
         <>
             <label htmlFor="search">{children}</label>
-            <input id={id} type={type} onChange={onInputChange} autoFocus={isFocused} value={value}/>
+            <input id={id} type={type} onChange={onInputChange} autoFocus={isFocused} onKeyDown={onKeyDown} value={value}/>
         </>
     );
 }
@@ -101,11 +99,9 @@ const App = () => {
                     isError: true,
                 }
             case STORY_ACTIONS.REMOVE_STORY:
-                console.log("remove: ", state, action)
                 return {
                     ...state,
                     data: state.data.filter((story) => {
-                        console.log("remove-filter: ", story.objectID, action.payload.objectID)
                         return story.objectID !== action.payload.objectID
                     })
                 }
@@ -115,26 +111,27 @@ const App = () => {
     }
 
     const [searchTerm, setSearchTerm] = useStorageState('search', 'React')
+    const [searchUrl, setSearchUrl] = useState()
     const handleSearch = (event) => {
-        console.log(event.target.value)
         setSearchTerm(event.target.value)
+        if(event.type === 'keydown' && event.key === 'Enter') {
+            setSearchUrl(`${API_ENDPOINT}?query=${searchTerm ? searchTerm : 'react'}`)
+        }
     }
 
     const [stories, dispatchStories] = useReducer(storiesReducer, {data: [], isLoading: false, isError: false})
 
     // load the stories
     const handleFetchStories = useCallback(() => {
-
         if(stories && !stories.isFirstLoad) {
             dispatchStories({type: STORY_ACTIONS.STORIES_FETCH_INIT})
         } else {
             dispatchStories({type: STORY_ACTIONS.FIRST_FETCH})
         }
 
-        fetch(`${API_ENDPOINT}?query=${searchTerm ? searchTerm : 'react'}`)
+        fetch(searchUrl)
             .then(res => res.json())
             .then(json => {
-                console.log("result: ", json)
                 dispatchStories({
                     type: STORY_ACTIONS.STORIES_FETCH_SUCCESS,
                     payload: json.hits,
@@ -144,7 +141,7 @@ const App = () => {
                 console.error("error: ", err)
                 dispatchStories({type: STORY_ACTIONS.STORES_FETCH_FAILURE})
             })
-    }, [searchTerm])
+    }, [searchUrl])
     useEffect(() => {
         handleFetchStories()
     }, [handleFetchStories])
@@ -153,12 +150,16 @@ const App = () => {
         dispatchStories({type: STORY_ACTIONS.REMOVE_STORY, payload: item})
     }
 
+    const [inputLogMessage, setInputLogMessage] = useState("--blank message--")
     const [logMessage, setLogMessage] = useLogMessage()
     const handleLogMessage = (event) => {
-        setLogMessage(event.target.value)
+        console.log(event)
+        setInputLogMessage(event.target.value)
+        if(event.type === 'keydown' && event.key === 'Enter') {
+            setLogMessage(event.target.value)
+        }
     }
 
-    console.log("state: ", stories)
     return (
         <div>
             {stories.isError && <p>Something went wrong!</p>}
@@ -166,11 +167,13 @@ const App = () => {
                 (<p>Loading...</p>) :
                 (
                     <>
-                        <InputWithLabel id="search" isFocused onInputChange={handleSearch}
-                                        value={searchTerm}><strong>Search:</strong></InputWithLabel>
-                        <InputWithLabel id="logMessage" type="url" onInputChange={handleLogMessage} value={logMessage}>
+                        <InputWithLabel id="search" isFocused onKeyDown={handleSearch} onInputChange={handleSearch} value={searchTerm}>
+                            <strong>Search:</strong>
+                        </InputWithLabel>
+                        <InputWithLabel id="logMessage" onKeyDown={handleLogMessage} onInputChange={handleLogMessage} value={inputLogMessage}>
                             <strong>Message:</strong>
                         </InputWithLabel>
+                        <em>Last Log Message: {logMessage}</em>
                         <Divider/>
                         <List stories={stories.data} onRemoveStory={handleRemoveStory}/>
                     </>
