@@ -1,7 +1,8 @@
-import {Divider} from "antd";
-
 import './App.css'
-import {useReducer, useState, useEffect, useCallback} from "react";
+
+import {useReducer, useState, useEffect, useCallback} from "react"
+import {Divider} from "antd"
+import axios from "axios"
 
 const API_ENDPOINT = 'https://hn.algolia.com/api/v1/search'
 
@@ -129,12 +130,12 @@ const App = () => {
             dispatchStories({type: STORY_ACTIONS.FIRST_FETCH})
         }
 
-        fetch(searchUrl)
-            .then(res => res.json())
-            .then(json => {
+        axios
+            .get(searchUrl)
+            .then(result => {
                 dispatchStories({
                     type: STORY_ACTIONS.STORIES_FETCH_SUCCESS,
-                    payload: json.hits,
+                    payload: result.data ? result.data.hits : [],
                 })
             })
             .catch((err) => {
